@@ -1,0 +1,847 @@
+{
+  "name": "E11 Email Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e11",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ac9edc47-8ee2-46ae-9d7a-5e7b8f273209",
+      "name": "E11 API",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        400
+      ],
+      "webhookId": "7c830d18-9a0c-454d-9c97-34addecbd3a0"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e715dbc3-7b15-4975-8c2e-c56411d5950b",
+              "name": "base_dir",
+              "value": "C:/Users/lenovo/.n8n-files",
+              "type": "string"
+            },
+            {
+              "id": "8ca31b46-4878-45be-a05c-8a9126668fdf",
+              "name": "resume_file",
+              "value": "resume.pdf",
+              "type": "string"
+            },
+            {
+              "id": "9c84d3e7-6a7a-4ddb-8894-61e008a1a008",
+              "name": "sender_email",
+              "value": "karthikprabhu319@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "39a7b881-a6ef-4880-b15a-dd8893ac6737",
+              "name": "api_token",
+              "value": "e11_e9124562b9266f8d6e54f18a",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6058b000-4770-4c57-8e28-6fea0029e288",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2990b772-0a29-48e4-897d-69c4804979e6",
+              "leftValue": "={{ $('E11 API').first().json.headers['x-e11-token'] || '' }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "={{ $json.api_token }}"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a65460a3-e2ec-4e2f-84cb-974c31408bec",
+      "name": "Token OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"error\": \"unauthorized\" }",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "id": "79090122-5f5c-4ec7-85f8-dfe8e153cd2d",
+      "name": "Respond 401",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1e6a8879-ed1c-465e-95ea-f5631adca249",
+                    "leftValue": "={{ $('E11 API').first().json.body?.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "send"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "send"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ed5ae72e-27d7-4836-b7ba-8c61bff3a413",
+                    "leftValue": "={{ $('E11 API').first().json.body?.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "stop"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "stop"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bdc3c54f-223b-40cb-94ec-0f38aaea90f3",
+                    "leftValue": "={{ $('E11 API').first().json.body?.action }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "rightValue": "status"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "status"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9b007267-2139-4941-be92-24f375529332",
+      "name": "Route",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        660,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"ok\": true }",
+        "options": {}
+      },
+      "id": "d29bf62a-6d43-4575-8b50-d816e7c81822",
+      "name": "Accepted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: { flag: 'run' },\n  binary: { data: await this.helpers.prepareBinaryData(Buffer.from('run', 'utf8'), 'stop.flag', 'text/plain') },\n}];\n"
+      },
+      "id": "827dd61a-b3d8-4c3e-a39f-ce6502f7b76d",
+      "name": "Reset Stop Flag",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('Config').first().json.base_dir }}/stop.flag",
+        "options": {}
+      },
+      "id": "63f4679d-0fc9-44a1-8646-b6dbab9fa48e",
+      "name": "Write Stop Flag",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Config').first().json.base_dir }}/sent_log.csv",
+        "options": {}
+      },
+      "id": "13188628-ce1e-4c22-9693-e319e48eca7a",
+      "name": "Read Sent Log",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        80
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "744fb0ba-217a-4828-8b9d-6d714e794837",
+      "name": "Parse Sent Log",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        80
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Everything the UI sends arrives in the webhook body.\nconst req = $('E11 API').first().json.body || {};\nconst contacts = Array.isArray(req.contacts) ? req.contacts : [];\nconst subjectTpl = String(req.subject || '').trim();\nconst bodyTpl = String(req.message || '');\nif (!subjectTpl || !bodyTpl.trim()) return [];\n\nconst clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));\nconst cap = clamp(parseInt(req.max_per_run, 10) || 40, 1, 200);\nconst dmin = clamp(parseInt(req.delay_min, 10) || 20, 5, 60);\nconst dmax = clamp(parseInt(req.delay_max, 10) || 45, dmin, 60);\n\n// emails already sent (from sent_log.csv)\nconst sent = new Set(\n  $('Parse Sent Log').all()\n    .map(i => String(i.json.email || '').trim().toLowerCase())\n    .filter(Boolean)\n);\n\n// company = text between @ and the first dot: akshay@flipkart.com -> Flipkart\nconst GENERIC = new Set(['gmail','yahoo','outlook','hotmail','rediffmail','icloud','proton','protonmail']);\nfunction companyFromEmail(email) {\n  const label = email.split('@')[1].split('.')[0];\n  if (GENERIC.has(label)) return 'your company';\n  return label.charAt(0).toUpperCase() + label.slice(1);\n}\nconst fill = (tpl, v) => tpl.replace(/\\{\\s*(first_name|last_name|email|company)\\s*\\}/g, (_, k) => v[k]);\n\nconst seen = new Set();\nconst out = [];\nfor (const c of contacts) {\n  const email = String(c.email || '').trim().toLowerCase();\n  if (!/^[^@\\s]+@[^@\\s]+\\.[a-z]{2,}$/.test(email)) continue;   // skip invalid / empty\n  if (sent.has(email) || seen.has(email)) continue;            // skip already sent + duplicates\n  seen.add(email);\n  const v = {\n    first_name: String(c.first_name || '').trim() || 'there',\n    last_name: String(c.last_name || '').trim(),\n    email,\n    company: companyFromEmail(email),\n  };\n  out.push({ json: { ...v, subject: fill(subjectTpl, v), message: fill(bodyTpl, v), delay_min: dmin, delay_max: dmax } });\n}\nreturn out.slice(0, cap);   // daily cap\n"
+      },
+      "id": "4177b8cd-c77b-40c1-848b-97142b485eac",
+      "name": "Prepare Contacts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "eae8c167-cb07-4f0a-8705-464d9478008e",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2220,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Config').first().json.base_dir }}/resume/{{ $('Config').first().json.resume_file }}",
+        "options": {}
+      },
+      "id": "d0d51e52-1391-432a-ac8f-d902a870fd42",
+      "name": "Read Resume",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        2440,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $('Config').first().json.sender_email }}",
+        "toEmail": "={{ $('Loop Over Items').item.json.email }}",
+        "subject": "={{ $('Loop Over Items').item.json.subject }}",
+        "emailFormat": "text",
+        "text": "={{ $('Loop Over Items').item.json.message }}",
+        "options": {
+          "appendAttribution": false,
+          "attachments": "data"
+        }
+      },
+      "id": "73629010-e03d-4730-94be-8458801bbe96",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2660,
+        200
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "l6QCvxR6l5w3A7JE",
+          "name": "SMTP account"
+        }
+      },
+      "webhookId": "9c52ab2f-4071-4ad8-8dde-c0582ce744fb"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const c = $('Loop Over Items').item.json;\nconst q = v => '\"' + String(v ?? '').replace(/\"/g, '\"\"') + '\"';\nconst line = [c.email, c.first_name, c.company, new Date().toISOString()].map(q).join(',') + '\\n';\nreturn {\n  json: { email: c.email, first_name: c.first_name, company: c.company },\n  binary: { data: await this.helpers.prepareBinaryData(Buffer.from(line, 'utf8'), 'sent_row.csv', 'text/csv') },\n};\n"
+      },
+      "id": "7174a313-90c1-45ad-8b80-8a3782248e61",
+      "name": "Build Log Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('Config').first().json.base_dir }}/sent_log.csv",
+        "options": {
+          "append": true
+        }
+      },
+      "id": "f459d61b-22f9-4e02-9766-586fd702dc6c",
+      "name": "Append To Sent Log",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        3100,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": "={{ (() => { const p = $('Prepare Contacts').first().json; return Math.floor(Math.random() * (p.delay_max - p.delay_min + 1)) + p.delay_min; })() }}",
+        "unit": "seconds"
+      },
+      "id": "02e6068a-64af-4580-bcfa-9c64a2c3ba84",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3320,
+        200
+      ],
+      "webhookId": "c31b94d2-79d7-4302-8d12-be8bacc5d3ff"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Config').first().json.base_dir }}/stop.flag",
+        "options": {}
+      },
+      "id": "f3eb9d27-a863-4c2c-9225-01fe64f1dad2",
+      "name": "Read Stop Flag",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        3540,
+        200
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let stop = false;\ntry {\n  const buf = await this.helpers.getBinaryDataBuffer(0, 'data');\n  stop = buf.toString('utf8').trim() === 'stop';\n} catch (e) {\n  stop = false;\n}\nreturn { json: { stop } };\n"
+      },
+      "id": "12f57294-fec1-4446-90de-82f07c4b0ac4",
+      "name": "Is Stopped",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3760,
+        200
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f6690ffc-86da-4b69-8cc0-d06871de5cfb",
+              "leftValue": "={{ $json.stop }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "93d60c0e-f257-4d75-8ab9-f22dead94dcd",
+      "name": "Keep Going?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3980,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: { flag: 'stop' },\n  binary: { data: await this.helpers.prepareBinaryData(Buffer.from('stop', 'utf8'), 'stop.flag', 'text/plain') },\n}];\n"
+      },
+      "id": "f5496edb-54b7-4aa4-b978-1ca3ebac6bd7",
+      "name": "Make Stop Flag",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('Config').first().json.base_dir }}/stop.flag",
+        "options": {}
+      },
+      "id": "9b0c453a-f1a7-40ec-9492-d22680f77c9e",
+      "name": "Write Stop",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"ok\": true, \"stopping\": true }",
+        "options": {}
+      },
+      "id": "6b46c110-0fea-439a-81bc-0d959a18f732",
+      "name": "Respond Stopped",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1340,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Config').first().json.base_dir }}/sent_log.csv",
+        "options": {}
+      },
+      "id": "e4f686c8-b20f-49c1-bdc0-08a1f90f0a44",
+      "name": "Read Log",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        900,
+        660
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "981e8685-99e2-4e40-aa3b-0d8a5fe894d0",
+      "name": "Parse Log",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        660
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json).filter(r => r && r.email);\nreturn [{ json: {\n  ok: true,\n  sent: rows.map(r => ({\n    email: String(r.email).trim().toLowerCase(),\n    first_name: r.first_name || '',\n    company: r.company || '',\n    sent_at: r.sent_at || '',\n  })),\n} }];\n"
+      },
+      "id": "e74957c4-6f0c-4b1b-b207-3f44435f10b4",
+      "name": "Build Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      },
+      "id": "1495f91f-130e-44be-b8f7-915a886f7300",
+      "name": "Respond Status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1560,
+        660
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "E11 API": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Token OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token OK?": {
+      "main": [
+        [
+          {
+            "node": "Route",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 401",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route": {
+      "main": [
+        [
+          {
+            "node": "Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Make Stop Flag",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accepted": {
+      "main": [
+        [
+          {
+            "node": "Reset Stop Flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reset Stop Flag": {
+      "main": [
+        [
+          {
+            "node": "Write Stop Flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Stop Flag": {
+      "main": [
+        [
+          {
+            "node": "Read Sent Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Sent Log": {
+      "main": [
+        [
+          {
+            "node": "Parse Sent Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Sent Log": {
+      "main": [
+        [
+          {
+            "node": "Prepare Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Contacts": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Read Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Resume": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Build Log Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Log Row": {
+      "main": [
+        [
+          {
+            "node": "Append To Sent Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append To Sent Log": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Read Stop Flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Stop Flag": {
+      "main": [
+        [
+          {
+            "node": "Is Stopped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Stopped": {
+      "main": [
+        [
+          {
+            "node": "Keep Going?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep Going?": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make Stop Flag": {
+      "main": [
+        [
+          {
+            "node": "Write Stop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Stop": {
+      "main": [
+        [
+          {
+            "node": "Respond Stopped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Log": {
+      "main": [
+        [
+          {
+            "node": "Parse Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Log": {
+      "main": [
+        [
+          {
+            "node": "Build Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Status": {
+      "main": [
+        [
+          {
+            "node": "Respond Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

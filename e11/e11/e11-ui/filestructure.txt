@@ -1,0 +1,16 @@
+|-- .env
+|-- .gitignore
+|-- index.html
+|-- package-lock.json
+|-- package.json
+|-- public
+    |-- favicon.svg
+|-- README.md
+|-- src
+    |-- api.js
+    |-- App.jsx
+    |-- components.jsx
+    |-- lib.js
+    |-- main.jsx
+    |-- styles.css
+|-- vite.config.js

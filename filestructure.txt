@@ -1,0 +1,23 @@
+|-- e11
+    |-- e11
+        |-- contacts.csv
+        |-- e11-ui
+            |-- .env
+            |-- .gitignore
+            |-- index.html
+            |-- package-lock.json
+            |-- package.json
+            |-- public
+                |-- favicon.svg
+            |-- README.md
+            |-- src
+                |-- api.js
+                |-- App.jsx
+                |-- components.jsx
+                |-- lib.js
+                |-- main.jsx
+                |-- styles.css
+            |-- vite.config.js
+        |-- e11-workflow.json
+|-- E11-README.md
+|-- e11-workflow.json
